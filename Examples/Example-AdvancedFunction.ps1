@@ -31,7 +31,7 @@ function Get-SystemInfo {
     BEGIN {
         Write-Output "LogName is $ErrorLog"
     } # BEGIN
-    
+
     PROCESS {
         foreach ($Computer in $ComputerName) {
             $os = Get-WmiObject -Class Win32_OperatingSystem -ComputerName $Computer
@@ -44,8 +44,8 @@ function Get-SystemInfo {
                 'SPVersion'=$os.ServicePackMajorVersion;
                 'BIOSSerial'=$bios.serialnumber;
                 'Manufacturer'=$comp.Manufacturer;
-                'Model'=$comp.Model 
-            } 
+                'Model'=$comp.Model
+            }
             $obj = New-Object -TypeName PSObject -Property $props
             Write-Output $obj
         }
@@ -55,5 +55,3 @@ function Get-SystemInfo {
     END {}
 
 } # Get-SystemInfo
-
-Get-SystemInfo -ErrorLog 'C:\Logfiles\lab7_errors.txt' -ComputerName localhost,localhost
