@@ -3,7 +3,8 @@
     Example-AdvancedFunction.ps1
 .DESCRIPTION
     This is an example of an advanced function as listed in the
-    PowerShell Toolmaking in a month of lunches book
+    PowerShell Toolmaking in a month of lunches book, by Don Jones
+    and Jeffrey Hicks.
 
     It get's expanded with every chapter
 .EXAMPLE
@@ -13,11 +14,13 @@
 .OUTPUTS
     Output (if any)
 .NOTES
-    Version 1.0
-    2018-05-20
-    By Marco Janse
+    Version 1.1
+    2018-06-24
+    Designed by Don Jones and Jeffrey Hicks
+    Written by Marco Janse
 
     Version History:
+    1.1 - Chapter 7, listing 7.8: remove Write-Object in BEGIN block
     1.0 - Chapter 7, listing 7.7
 #>
 
@@ -28,9 +31,7 @@ function Get-SystemInfo {
 
         [string]$ErrorLog
     )
-    BEGIN {
-        Write-Output "LogName is $ErrorLog"
-    } # BEGIN
+    BEGIN {}
 
     PROCESS {
         foreach ($Computer in $ComputerName) {
