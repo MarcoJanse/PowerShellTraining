@@ -14,10 +14,11 @@
 .OUTPUTS
     Output (if any)
 .NOTES
+    PowerShell Toolmaking in a Month of Lunches, Listing 7.8
     Version 1.1
-    2018-06-24
+    Last modified on 24-06-2018
     Designed by Don Jones and Jeffrey Hicks
-    Written by Marco Janse
+    Lab executed by Marco Janse
 
     Version History:
     1.1 - Chapter 7, listing 7.8: remove Write-Object in BEGIN block
