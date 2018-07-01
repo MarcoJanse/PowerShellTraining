@@ -11,7 +11,7 @@
 .OUTPUTS
     Output (if any)
 .NOTES
-    PowerShell Toolmaking in a Month of Lunches, LAB A
+    PowerShell Toolmaking in a Month of Lunches, Lab A
     Version 1.3
     Last Modified on 01-07-2018
     Designed by Don Jones and Jeffrey Hicks
