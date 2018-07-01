@@ -49,6 +49,7 @@ function Get-ComputerDriveInfo {
             Write-Verbose "Processing $Computer"
             $Volumes = Get-CimInstance -ClassName Win32_Volume -Filter "DriveType='3'" -ComputerName $Computer
             foreach ($Volume in $Volumes) {
+                Write-Verbose "Processing volume $Volume"
                 $hash = @{
                     'ComputerName' = $computer;
                     'Drive'        = $Volume.Caption;
