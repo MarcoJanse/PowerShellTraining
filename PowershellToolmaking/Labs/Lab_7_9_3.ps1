@@ -12,12 +12,13 @@
     Output (if any)
 .NOTES
     PowerShell Toolmaking in a Month of Lunches, 7.9.3. LAB C
-    Version 0.1
-    Last Modified on 24-06-2018
+    Version 1.0
+    Last Modified on 01-07-2018
     Designed by Don Jones and Jeffrey Hicks
     Lab executed by Marco Janse
 
     Version History:
+    Version 1.0 - Finished LAB C.
     Version 0.1 - LAB C, chapter 7.9.3. --IN PROGRESS
 
 #>
@@ -27,7 +28,7 @@ function Get-WindowsServiceProcessDetails {
     param (
         # Parameter ComputerName
         [Parameter(Mandatory=$true)]
-        [string]
+        [string[]]
         $ComputerName = 'localhost',
 
         # Parameter ErrorLog
@@ -40,17 +41,25 @@ function Get-WindowsServiceProcessDetails {
 
     process {
         foreach ($Computer in $ComputerName) {
-            $Services = Get-CimInstance -ClassName Win32_Service -ComputerName $Computer -Filter "State='Running'"
+            $Services = Get-CimInstance -ComputerName $Computer -ClassName Win32_Service -Filter "State='Running'"
+
             foreach ($Service in $Services) {
-                $Process = Get-CimInstance -ClassName Win32_Process -Filter "ProcessID='$Service.ProcessId'"
+                $Process = Get-CimInstance -ComputerName $Computer -ClassName Win32_Process | Where-Object { $_.ProcessID -eq $service.ProcessId }
+
+                $hash = @{
+                    'ComputerName' = $Computer;
+                    'Displayname' = $Service.DisplayName;
+                    'Service Name' = $Service.Name;
+                    'Process Name' = $Process.Name;
+                    'Process ID' = $process.ProcessId;
+                    'VM Size' = $Process.VirtualSize;
+                    'Peak Page File' = $Process.PeakPageFileUsage;
+                    'Thread Count' = $Process.ThreadCount
+                } # $hash
+
+                New-Object -TypeName psobject -Property $hash
+
             } # foreach $Service
-            $hash = @{
-                'ComputerName' = $Computer;
-                'Service Name' = $Service.Name;
-                'Process Name' = $Process.Name
-
-
-            }
 
         } # foreach $Computer
     }
@@ -58,3 +67,5 @@ function Get-WindowsServiceProcessDetails {
     end {
     }
 }
+
+Get-WindowsServiceProcessDetails -ComputerName 'localhost','maja-lpt-01'
