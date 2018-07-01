@@ -12,12 +12,14 @@
     Output (if any)
 .NOTES
     PowerShell Toolmaking in a Month of Lunches, 7.9.3. LAB C
-    Version 1.0
+    Version 1.2
     Last Modified on 01-07-2018
     Designed by Don Jones and Jeffrey Hicks
     Lab executed by Marco Janse
 
     Version History:
+    1.2 - Lab A expanded, chapter 8.9.3.
+        - Added Verbose output and parameter attributes
     1.1 - Changed the file naming to mention Lab name
     1.0 - Finished LAB C.
     0.1 - LAB C, chapter 7.9.3. --IN PROGRESS
@@ -28,7 +30,9 @@ function Get-WindowsServiceProcessDetails {
     [CmdletBinding()]
     param (
         # Parameter ComputerName
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,
+        ValueFromPipeline=$true)]
+        [ValidateNotNullOrEmpty()]
         [string[]]
         $ComputerName = 'localhost',
 
@@ -41,10 +45,13 @@ function Get-WindowsServiceProcessDetails {
     }
 
     process {
+        Write-Verbose "Beginning PROCESS-block.."
         foreach ($Computer in $ComputerName) {
+            Write-Verbose "Processing $Computer.."
             $Services = Get-CimInstance -ComputerName $Computer -ClassName Win32_Service -Filter "State='Running'"
 
             foreach ($Service in $Services) {
+                Write-Verbose "Processing service $service.."
                 $Process = Get-CimInstance -ComputerName $Computer -ClassName Win32_Process | Where-Object { $_.ProcessID -eq $service.ProcessId }
 
                 $hash = @{
@@ -63,10 +70,10 @@ function Get-WindowsServiceProcessDetails {
             } # foreach $Service
 
         } # foreach $Computer
-    }
+    } # process
 
     end {
     }
-}
+} # Get-WindowsServiceProcessDetails
 
-Get-WindowsServiceProcessDetails -ComputerName 'localhost'
+'localhost','localhost' | Get-WindowsServiceProcessDetails -Verbose
