@@ -12,13 +12,14 @@
     Output (if any)
 .NOTES
     PowerShell Toolmaking in a Month of Lunches, 7.9.2. LAB B
-    Version 1.0
-    Last Modified on 24-06-2018
+    Version 1.1
+    Last Modified on 01-07-2018
     Designed by Don Jones and Jeffrey Hicks
     Lab executed by Marco Janse
 
     Version History:
-    Version 1.0 - LAB B, chapter 7.9.2.
+    1.1 - Changed the file naming to mention Lab name
+    1.0 - LAB B, chapter 7.9.2.
 
 #>
 

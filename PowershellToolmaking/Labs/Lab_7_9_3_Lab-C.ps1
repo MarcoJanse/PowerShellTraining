@@ -18,8 +18,9 @@
     Lab executed by Marco Janse
 
     Version History:
-    Version 1.0 - Finished LAB C.
-    Version 0.1 - LAB C, chapter 7.9.3. --IN PROGRESS
+    1.1 - Changed the file naming to mention Lab name
+    1.0 - Finished LAB C.
+    0.1 - LAB C, chapter 7.9.3. --IN PROGRESS
 
 #>
 
@@ -68,4 +69,4 @@ function Get-WindowsServiceProcessDetails {
     }
 }
 
-Get-WindowsServiceProcessDetails -ComputerName 'localhost','maja-lpt-01'
+Get-WindowsServiceProcessDetails -ComputerName 'localhost'
