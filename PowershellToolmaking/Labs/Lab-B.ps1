@@ -19,6 +19,7 @@
 
     Version History:
     1.2 - Lab B expanded, chapter 8.9.2.
+        - Added Verbose output and parameter attributes
     1.1 - Changed the file naming to mention Lab name
     1.0 - Lab B, chapter 7.9.2.
 
