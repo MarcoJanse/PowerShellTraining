@@ -1,23 +1,36 @@
 <#
 .SYNOPSIS
-    Short description
+    Gets info from running Windows services with process details
 .DESCRIPTION
-    Long description
+    Get-WindowsServiceProcessDetails will query WMI for running
+    Windows services and gets the associated process details
+
+    It uses the WmiObject Cmdlets, that depend on DCOM and RPC traffic
+    to query remote computers
+.PARAMETER ComputerName
+    The name of the computer(s) that will be queried.
+.PARAMETER ErrorLog
+    Used to specify a path to a file to log all errors
+    Can be used for computers that cannot be queried
+.PARAMETER LogErrors
+    A switch parameter that controls if error logging should be enabled
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
-.INPUTS
-    Inputs (if any)
-.OUTPUTS
-    Output (if any)
+    PS C:\>Get-WindowsServiceProcessDetails -ComputerName server01
+    Gets running service and process details of server01
+
+    PS C:\> 'localhost','server02' | Get-WindowsServiceProcessDetails -Verbose
+    Uses pipelining to query the local computer and server02 for process details
+    and gives verbose output
 .NOTES
     PowerShell Toolmaking in a Month of Lunches, 7.9.3. LAB C
-    Version 1.2
-    Last Modified on 01-07-2018
+    Version 1.3
+    Last Modified on 08-07-2018
     Designed by Don Jones and Jeffrey Hicks
     Lab executed by Marco Janse
 
     Version History:
+    1.3 - added comment based help and switch parameter
+        - chapter 9.4.3.
     1.2 - Lab A expanded, chapter 8.9.3.
         - Added Verbose output and parameter attributes
     1.1 - Changed the file naming to mention Lab name
@@ -38,7 +51,10 @@ function Get-WindowsServiceProcessDetails {
 
         # Parameter ErrorLog
         [string]
-        $ErrorLog = 'C:\ErrorLog.txt'
+        $ErrorLog = 'C:\ErrorLog.txt',
+
+        # Parameter LogErrors
+        [switch] $LogErrors
     )
 
     begin {
