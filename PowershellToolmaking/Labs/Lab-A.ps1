@@ -1,23 +1,35 @@
 <#
 .SYNOPSIS
-    Short description
+    Gets details about computers using WMI
 .DESCRIPTION
-    Long description
+    Get ComputerDetails will query one or more computers
+    using WMI and list details like serialnumber, model
+    and OS version.
+
+    The script uses the CIM Cmdlets to query remote
+    computers using PowerShell Remoting
+.PARAMETER ComputerName
+    The name of the computer(s) that will be queried.
+.PARAMETER ErrorLog
+    Used to specify a path to a file to log all errors
+    Can be used for computers that cannot be queried
+.PARAMETER LogErrors
+    A switch parameter that controls if error logging should be enabled
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
-.INPUTS
-    Inputs (if any)
-.OUTPUTS
-    Output (if any)
+    PS C:\> Get-ComputerInfo -ComputerName localhost,server02 -Verbose
+    Gets the Computer Info from localhost and server02 with verbose output
 .NOTES
     PowerShell Toolmaking in a Month of Lunches, Lab A
-    Version 1.3
-    Last Modified on 01-07-2018
+    Version 1.4
+    Last Modified on 08-07-2018
     Designed by Don Jones and Jeffrey Hicks
     Lab executed by Marco Janse
 
     Version History:
+    1.4 - added comment based help and switch parameter
+        - chapter 9.4.1.
+        - also renamed function as there was already a
+        - Cmdlet called Get-ComputerInfo
     1.3 - Lab A expanded, chapter 8.9.1.
           Added Verbose output and parameter attributes
     1.2 - Changed the file naming to mention Lab name
@@ -26,7 +38,7 @@
 
 #>
 
-function Get-ComputerInfo {
+function Get-ComputerDetails {
     [CmdletBinding()]
     param(
         # Parameter ComputerName
@@ -36,7 +48,10 @@ function Get-ComputerInfo {
         [string[]] $ComputerName='localhost',
 
         # Parameter ErrorLog
-        [string] $ErrorLog='C:\ErrorLog.txt'
+        [string] $ErrorLog='C:\ErrorLog.txt',
+
+        # Parameter LogErrors
+        [switch] $LogErrors
     )
 
     BEGIN {
@@ -80,6 +95,6 @@ function Get-ComputerInfo {
 
     END {}
 
-} # Get-ComputerInfo
+} # Get-ComputerDetails
 
-'localhost','maja-lpt-01' | Get-ComputerInfo -Verbose
+Get-Help Get-ComputerDetails -Detailed
