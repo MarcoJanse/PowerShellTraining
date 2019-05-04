@@ -5,8 +5,8 @@
     Get-WindowsServiceProcessDetails will query WMI for running
     Windows services and gets the associated process details
 
-    It uses the WmiObject Cmdlets, that depend on DCOM and RPC traffic
-    to query remote computers
+    It uses the CimInstance Cmdlets to query WMI, 
+    so it requires at least PowerShell version 3
 .PARAMETER ComputerName
     The name of the computer(s) that will be queried.
 .PARAMETER ErrorLog
