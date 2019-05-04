@@ -20,12 +20,14 @@
     Gets the Computer Info from localhost and server02 with verbose output
 .NOTES
     PowerShell Toolmaking in a Month of Lunches, Lab A
-    Version 1.4
-    Last Modified on 08-07-2018
+    Version 1.5
+    Last Modified on 04-05-2019
     Designed by Don Jones and Jeffrey Hicks
     Lab executed by Marco Janse
 
     Version History:
+    1.5 - added errorhandling
+        - chapter 10.8.1
     1.4 - added comment based help and switch parameter
         - chapter 9.4.1.
         - also renamed function as there was already a
@@ -48,7 +50,7 @@ function Get-ComputerDetails {
         [string[]] $ComputerName='localhost',
 
         # Parameter ErrorLog
-        [string] $ErrorLog='C:\ErrorLog.txt',
+        [string] $ErrorLog='C:\Logfiles\Lab-A_ErrorLog.log',
 
         # Parameter LogErrors
         [switch] $LogErrors
@@ -64,29 +66,41 @@ function Get-ComputerDetails {
 
         foreach ($Computer in $ComputerName) {
             Write-Verbose "Processing $computer"
-            Write-Verbose 'Quering WMI using CIM cmdlets...'
-            $comp = Get-CimInstance -ClassName Win32_ComputerSystem -ComputerName $Computer
-            $bios = Get-CimInstance -ClassName Win32_BIOS -ComputerName $Computer
-            $os = Get-CimInstance -ClassName Win32_OperatingSystem -ComputerName $Computer
+            Write-Verbose "Quering WMI using CIM cmdlets..."
+            try {
+                $Everything_Ok = $true
+                $comp = Get-CimInstance -ClassName Win32_ComputerSystem -ComputerName $Computer -ErrorAction stop
+            } # try
+            catch {
+                $Everything_Ok = $false
+                Write-Warning "Custom warning: $($_.Exception.Message)"
+                if ($LogErrors) {
+                    $Computer | Out-File $ErrorLog -Append
+                } # if $LogErrors
+            } # catch
+            if ($Everything_Ok) {
+                $bios = Get-CimInstance -ClassName Win32_BIOS -ComputerName $Computer
+                $os = Get-CimInstance -ClassName Win32_OperatingSystem -ComputerName $Computer
 
-            $props = @{
-                'Workgroup'=$comp.Workgroup;
-                'AdminPassword'= switch ($comp.AdminPasswordStatus){
-                        0 {"Disabled"}
-                        1 {"Enabled"}
-                        2 {"Not Implemented"}
-                        3 {"Unknown"}
-                    };
-                'Model'=$comp.Model;
-                'Manufacturer'=$comp.Manufacturer;
-                'SerialNumber'=$bios.SerialNumber;
-                'Version'=$os.Version;
-                'ServicePackMajorVersion'=$os.ServicePackMajorVersion
-            } # props
+                $props = @{
+                    'Workgroup'=$comp.Workgroup;
+                    'AdminPassword'= switch ($comp.AdminPasswordStatus){
+                            0 {"Disabled"}
+                            1 {"Enabled"}
+                            2 {"Not Implemented"}
+                            3 {"Unknown"}
+                        };
+                    'Model'=$comp.Model;
+                    'Manufacturer'=$comp.Manufacturer;
+                    'SerialNumber'=$bios.SerialNumber;
+                    'Version'=$os.Version;
+                    'ServicePackMajorVersion'=$os.ServicePackMajorVersion
+                } # props
 
-            Write-Verbose "adding custom objects to PSObject for $Computer"
-            $obj = New-Object -TypeName psobject -Property $props
-            Write-Output $obj
+                Write-Verbose "adding custom objects to PSObject for $Computer"
+                $obj = New-Object -TypeName psobject -Property $props
+                Write-Output $obj
+            } #if $Everything_Ok
 
         } # for each Computer
 
@@ -97,4 +111,4 @@ function Get-ComputerDetails {
 
 } # Get-ComputerDetails
 
-Get-Help Get-ComputerDetails -Detailed
+Get-ComputerDetails -ComputerName NOTONLINE,localhost -LogErrors -Verbose
