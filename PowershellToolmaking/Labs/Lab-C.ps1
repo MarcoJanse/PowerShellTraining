@@ -23,12 +23,14 @@
     and gives verbose output
 .NOTES
     PowerShell Toolmaking in a Month of Lunches, 7.9.3. LAB C
-    Version 1.3
-    Last Modified on 08-07-2018
+    Version 1.4
+    Last Modified on 05-05-2019
     Designed by Don Jones and Jeffrey Hicks
     Lab executed by Marco Janse
 
     Version History:
+    1.4 - added error handling
+        - chapter 10.8.3
     1.3 - added comment based help and switch parameter
         - chapter 9.4.3.
     1.2 - Lab A expanded, chapter 8.9.3.
@@ -51,7 +53,7 @@ function Get-WindowsServiceProcessDetails {
 
         # Parameter ErrorLog
         [string]
-        $ErrorLog = 'C:\ErrorLog.txt',
+        $ErrorLog = 'C:\Logfiles\Lab-C_ErrorLog.log',
 
         # Parameter LogErrors
         [switch] $LogErrors
@@ -64,26 +66,39 @@ function Get-WindowsServiceProcessDetails {
         Write-Verbose "Beginning PROCESS-block.."
         foreach ($Computer in $ComputerName) {
             Write-Verbose "Processing $Computer.."
-            $Services = Get-CimInstance -ComputerName $Computer -ClassName Win32_Service -Filter "State='Running'"
+            try {
+                $Everything_OK = $true
+                $Services = Get-CimInstance -ComputerName $Computer -ClassName Win32_Service -Filter "State='Running'" -ErrorAction Stop
+            }
+            catch {
+                $Everything_OK = $false
+                Write-Warning "Custom Warning: $($_.Exception.Message)"
+                if ($LogErrors){
+                    Remove-Item $ErrorLog -ErrorAction SilentlyContinue
+                    $ComputerName | Out-File $ErrorLog -Append
+                }
+            }
+            if ($Everything_OK) {
+                Write-Verbose "Succesfully contacted $Computer using WMI, querying services..."
+                foreach ($Service in $Services) {
+                    Write-Verbose "Processing service $service.."
+                    $Process = Get-CimInstance -ComputerName $Computer -ClassName Win32_Process | Where-Object { $_.ProcessID -eq $service.ProcessId }
 
-            foreach ($Service in $Services) {
-                Write-Verbose "Processing service $service.."
-                $Process = Get-CimInstance -ComputerName $Computer -ClassName Win32_Process | Where-Object { $_.ProcessID -eq $service.ProcessId }
+                    $hash = @{
+                        'ComputerName' = $Computer;
+                        'Displayname' = $Service.DisplayName;
+                        'Service Name' = $Service.Name;
+                        'Process Name' = $Process.Name;
+                        'Process ID' = $process.ProcessId;
+                        'VM Size' = $Process.VirtualSize;
+                        'Peak Page File' = $Process.PeakPageFileUsage;
+                        'Thread Count' = $Process.ThreadCount
+                    } # $hash
 
-                $hash = @{
-                    'ComputerName' = $Computer;
-                    'Displayname' = $Service.DisplayName;
-                    'Service Name' = $Service.Name;
-                    'Process Name' = $Process.Name;
-                    'Process ID' = $process.ProcessId;
-                    'VM Size' = $Process.VirtualSize;
-                    'Peak Page File' = $Process.PeakPageFileUsage;
-                    'Thread Count' = $Process.ThreadCount
-                } # $hash
+                    New-Object -TypeName psobject -Property $hash
 
-                New-Object -TypeName psobject -Property $hash
-
-            } # foreach $Service
+                } # foreach $Service
+            } # if ($Everything_OK)
 
         } # foreach $Computer
     } # process
@@ -92,4 +107,4 @@ function Get-WindowsServiceProcessDetails {
     }
 } # Get-WindowsServiceProcessDetails
 
-'localhost','localhost' | Get-WindowsServiceProcessDetails -Verbose
+'localhost','NOTONLINE' | Get-WindowsServiceProcessDetails -LogErrors -Verbose
