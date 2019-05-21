@@ -15,7 +15,8 @@
     Lab executed by Marco Janse
     
     Version History:
-    1.0 - Did the initial exercise
+    1.1 - Forgot a bloody line
+    1.0 - Did the initial exercise from listing 11.4
 #>
 
 $data = Import-Csv C:\Scripts\Input\data.csv
@@ -35,3 +36,4 @@ foreach ($line in $data) {
     }
 }
 "totalqty,totalbought,totalsold,totalamt" | Out-File C:\Scripts\Output\summary.csv
+"$totalqty,$totalbought,$totalsold,$($totalbought-$totalsold)" | Out-File C:\Scripts\Output\summary.csv -Append
