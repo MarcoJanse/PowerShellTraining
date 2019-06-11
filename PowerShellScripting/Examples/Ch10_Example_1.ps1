@@ -16,13 +16,14 @@
     for older Operating Systems
 .PARAMETER ProtocolFailback
 .NOTES
-    Version 0.3
+    Version 0.4
     Last modified on 11-06-2019
     By Marco Janse
 
     Version History
-    0.3 - listing 10.2 --completed--
-    0.2 - listing 10.2 - basic functional code --NOT FINISHED--
+    0.4 - listing 10.2 - adding output
+    0.3 - listing 10.1 --completed--
+    0.2 - listing 10.1 - basic functional code --NOT FINISHED--
     0.1 - paragraph 10.1.1
 #>
 
@@ -54,7 +55,10 @@ function Get-MachineInfo {
         $Session | Remove-CimSession
 
         # Output data
-        # TODO
+        $os | Select-Object -Property @{
+                n='ComputerName' ;e={$Computer}},
+                Version,
+                ServicePackMajorVersion
 
     } # for each Computer
  
