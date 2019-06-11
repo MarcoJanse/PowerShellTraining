@@ -16,11 +16,12 @@
     for older Operating Systems
 .PARAMETER ProtocolFailback
 .NOTES
-    Version 0.1
-    Last modified on 10-06-2019
+    Version 0.2
+    Last modified on 11-06-2019
     By Marco Janse
 
     Version History
+    0.2 - paragraph 10.1.2 - basic functional code --NOT FINISHED--
     0.1 - paragraph 10.1.1
 #>
 
@@ -31,4 +32,22 @@ function Get-MachineInfo {
         [string]$Protocol = "wsman",
         [switch]$ProtocolFailBack
     )
+
+    foreach ($Computer in $ComputerName) {
+
+        # Establish session protocol
+        if ($Protocol -eq 'Dcom') {
+            $option = New-CimSessionOption -Protocol Dcom
+        }
+        else {
+            $option = New-CimSessionOption -Protocol Wsman
+        }
+
+        # Connect session
+        $Session = New-CimSession -ComputerName $Computer -SessionOption $option
+
+        # Query data
+        $os = 
+
+    } # for each Computer
 }
