@@ -27,11 +27,15 @@
 .PARAMETER NewUser
     The user account the service should run under.
 .NOTES
-    Version 1.0
+    Version 1.1
     Last modified on 12-06-2019
+    Designed by Don Jones and Jeffrey Hicks
+    Lab executed by Marco Janse
+
     By Marco Janse
 
     Version History
+    1.1 - added credits to the notes
     1.0 - Lab from paragraph 10.5 (your turn)
 #>
 
