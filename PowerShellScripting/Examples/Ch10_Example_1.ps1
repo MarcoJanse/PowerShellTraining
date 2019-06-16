@@ -16,11 +16,12 @@
     for older Operating Systems
 .PARAMETER ProtocolFailback
 .NOTES
-    Version 0.4
-    Last modified on 11-06-2019
+    Version 0.5
+    Last modified on 16-06-2019
     By Marco Janse
 
     Version History
+    0.5 - listing 11.1.4 - advanced function with parameter validation
     0.4 - listing 10.2 - adding output
     0.3 - listing 10.1 --completed--
     0.2 - listing 10.1 - basic functional code --NOT FINISHED--
@@ -28,10 +29,18 @@
 #>
 
 function Get-MachineInfo {
+    [CmdletBinding()]
     Param (
+        [Parameter(ValueFromPipeline=$true,
+                   Mandatory=$true)]
+        [Alias('CN','MachineName','Name')]
         [string[]]$ComputerName,
+
         [string]$LogFailurersToPath,
-        [string]$Protocol = "wsman",
+
+        [ValidateSet('Wsman','Dcom')]
+        [string]$Protocol = "Wsman",
+
         [switch]$ProtocolFailBack
     )
 
