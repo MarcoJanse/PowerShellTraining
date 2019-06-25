@@ -20,10 +20,11 @@
 .PARAMETER ProtocolFailback
 .NOTES
     Version 1.0
-    Last modified on 24-06-2019
+    Last modified on 25-06-2019
     By Marco Janse
 
     Version History
+    1.0 - fixed version. Brain was overheated yesterday...
     0.6 - renamed to Get-MachineInfo, now with parameter splatting
         - listing 12.1.
         - --IN PROGRESS--NOT WORKING YET--
@@ -72,13 +73,13 @@ function Get-MachineInfo {
                             'ClassName'='Win32_OperatingSystem';
                             'CimSession'=$Session
                           }
-            $os = Get-CimInstance $os_params
+            $os = Get-CimInstance @os_params
 
             $cs_params = @{
                             'ClassName'='Win32_ComputerSystem';
                             'CimSession'=$session
                           }
-            $cs = Get-CimInstance $cs_params
+            $cs = Get-CimInstance @cs_params
             
             $sysdrive = $os.SystemDrive
             $drive_params = @{
@@ -86,7 +87,7 @@ function Get-MachineInfo {
                                 'Filter'="DeviceId='$sysdrive'";
                                 'CimSession'=$Session
                              }
-            $drive = Get-CimSession $drive_params
+            $drive = Get-CimInstance @drive_params
 
             $proc_params = @{
                                 'ClassName'='Win32_Processor';
@@ -99,16 +100,16 @@ function Get-MachineInfo {
 
             # Output data
             $props = @{
-                        'ComputerName'=$Computer;
-                        'OSVersion'=$os.Version;
-                        'SPVersion'=$os.ServicePackMajorVersion;
-                        'OSBuild'=$os.Buildnumber;
-                        'Manufacturer'=$cs.Manufacturer;
-                        'Procs'=$cs.NumberOfProcessors;
-                        'Cores'=$cs.NumberOfLogicalProcessors;
-                        'RAM'=($cs.TotalPhysicalMemory / 1GB);
-                        'Arch'=$proc.AddressWidth;
-                        'SysDriveFreeSpace'=$drive.FreeSpace
+                        ComputerName = $Computer;
+                        OSVersion = $os.Version;
+                        SPVersion = $os.ServicePackMajorVersion;
+                        OSBuild = $os.Buildnumber;
+                        Manufacturer = $cs.Manufacturer;
+                        Procs = $cs.NumberOfProcessors;
+                        Cores = $cs.NumberOfLogicalProcessors;
+                        RAM = ($cs.TotalPhysicalMemory / 1GB);
+                        Arch = $proc.AddressWidth;
+                        SysDriveFreeSpace = $drive.FreeSpace
             } # props
 
             $obj = New-Object -TypeName psobject -Property $props
@@ -121,5 +122,3 @@ function Get-MachineInfo {
     END {}
 
 } # Get-MachineInfo
-
-Get-MachineInfo -ComputerName localhost -Protocol Wsman
