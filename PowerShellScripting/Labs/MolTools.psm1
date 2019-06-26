@@ -10,12 +10,14 @@
     to change the user and (optionally) the password for a
     Windows service to run under.
 .NOTES
-    Version 2.0
-    Last modified on 16-06-2019
+    Version 2.1
+    Last modified on 26-06-2019
     Designed by Don Jones and Jeffrey Hicks
     Lab executed by Marco Janse
 
     Version History:
+    2.1 - Splatting and Return Value translation in output
+        - paragraph 12.6.2
     2.0 - Changed to PS Module
         - Changed Set-TMServicePassowrd to and advanced function
         - paragraph 11.2.2
@@ -111,9 +113,26 @@ function Set-TMServicePassword {
                 $args = @{'StartPassword' = $NewPassword }
             }
 
-            Invoke-CimMethod -ComputerName $Computer -Query "Select * FROM Win32_Service WHERE Name='$ServiceName'" -MethodName change -Arguments $args |
-                Select-Object -Property @{n='ComputerName';e={$Computer}},
-                                        @{n='Result';e={$_.ReturnValue}}
+            $Params = @{
+                            CimSession = $Session;
+                            Query = "Select * FROM Win32_Service WHERE Name='$ServiceName'";
+                            MethodName = 'Change';
+                            Arguments = $args
+                          }
+            $ret = Invoke-CimMethod @Params 
+
+            switch ($ret.ReturnValue) {
+                0 { $status = "Success" }
+                22 { $status = "Invalid Account" }
+                Default { $status = "Failed:$($ret.ReturnValue)"}
+            } # switch
+            
+            $props = @{
+                        ComputerName = $computer;
+                        Status = $status;
+                      }
+            $obj = New-Object -TypeName PSObject -Property $props
+            Write-Output $obj
             
             $session | Remove-CimSession
 
