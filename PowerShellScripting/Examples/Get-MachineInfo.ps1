@@ -19,11 +19,12 @@
     for older Operating Systems
 .PARAMETER ProtocolFailback
 .NOTES
-    Version 1.0
-    Last modified on 25-06-2019
+    Version 1.1
+    Last modified on 29-06-2019
     By Marco Janse
 
-    Version History
+    Version History:
+    1.1 - adding verbose output
     1.0 - fixed version. Brain was overheated yesterday...
     0.6 - renamed to Get-MachineInfo, now with parameter splatting
         - listing 12.1.
@@ -65,10 +66,10 @@ function Get-MachineInfo {
                 $option = New-CimSessionOption -Protocol Wsman
             }
 
-            # Connect session
+            Write-Verbose -Message "Connecting to $computer over $protocol"
             $Session = New-CimSession -ComputerName $Computer -SessionOption $option
 
-            # Query data
+            Write-Verbose -Message "Querying from $computer"
             $os_params = @{
                             'ClassName'='Win32_OperatingSystem';
                             'CimSession'=$Session
@@ -95,11 +96,11 @@ function Get-MachineInfo {
                             }
             $proc = Get-CimInstance @proc_params | Select-Object -First 1
 
-            # Close session
+            Write-Verbose -Message "Closing session to $computer"
             $Session | Remove-CimSession
 
-            # Output data
-            $props = @{
+            Write-Verbose -Message "Outputting for $computer"
+            $obj = [PSCustomObject]@{
                         ComputerName = $Computer;
                         OSVersion = $os.Version;
                         SPVersion = $os.ServicePackMajorVersion;
@@ -110,9 +111,8 @@ function Get-MachineInfo {
                         RAM = ($cs.TotalPhysicalMemory / 1GB);
                         Arch = $proc.AddressWidth;
                         SysDriveFreeSpace = $drive.FreeSpace
-            } # props
-
-            $obj = New-Object -TypeName psobject -Property $props
+            } # obj
+            
             Write-Output $obj
 
         } # for each Computer
