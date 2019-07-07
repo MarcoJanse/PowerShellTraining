@@ -1,29 +1,44 @@
 <#
 .SYNOPSIS
-    Get-MachineInfo function example
+    Retrieved specific information about one or more
+    computers, using WMI or CIM.
 .DESCRIPTION
-    Get-MachineInfo is an example function in the
-    Learn PowerShell Scripting in a Month of Lunches book
-
-    During the chapters in the book, it gets expanded from
-    a simple function to an advanced function
-.EXAMPLE
-    Get-MachineInfo -ComputerName Localhost
+    This command uses either WMI or CIM to retrieve
+    specific information about one or more computers.
+    You must run this command as a user who has permission
+    to remotely query CO+IM or WMI on the machines
+    involved. You can specify a starting protocol (CIM by
+    default), and specify that, in the event of a failure,
+    the other protocol be used on a per-machine basis.
 .PARAMETER ComputerName
-    Enter one or more computernames, seperated by commas
+    One or more computer names, seperated by commas
+    When using WMI, this can also be IP addresses.
+    IP addresses may not work for CIM.
 .PARAMETER LogFailuresToPath
-    Can be used to specify a path to a logfile to log all 
-    failed computer queries
+    A path and filename to write failed computer names to.
+    If omitted, no log will be written.
 .PARAMETER Protocol
-    Can be used to switch between WSMAN (default) or DCOM
-    for older Operating Systems
+    Valid values: Wsman (uses CIM) or Dcom (uses WMI).
+    Will be used for all machines. "Wsman" is the default.
 .PARAMETER ProtocolFailback
+    Specify this to automatically try the other protocol
+    if a machine fails.
+.EXAMPLE
+    Get-MachineInfo -ComputerName ONE,TWO,THREE
+    This example will query three machines
+.EXAMPLE
+    Get-ADUser -Filter * | Select -Expand Name | Get-MachineInfo
+    This example will try to query all machines in AD
 .NOTES
-    Version 1.1
-    Last modified on 29-06-2019
+    Version 1.2
+    Last modified on 07-07-2019
     By Marco Janse
+.LINK
+    https://github.com/MarcoJanse/PowerShellTraining/blob/master/PowerShellScripting/Examples/Get-MachineInfo.ps1
 
     Version History:
+    1.2 - added new command based help
+        - listing 14.1
     1.1 - adding verbose output
     1.0 - fixed version. Brain was overheated yesterday...
     0.6 - renamed to Get-MachineInfo, now with parameter splatting
