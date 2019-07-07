@@ -1,37 +1,7 @@
-<#
-.SYNOPSIS
-    MolTools with function Set-TMServiceLogon
-.DESCRIPTION
-    MolTools can be used as a PowerShell Module and
-    contains a function created as a lab in chapter 10 
-    of Learn PowerShell Scripting in a Month of Lunches
-
-    Currently it contains one function: Set-TMServiceLogon
-    to change the user and (optionally) the password for a
-    Windows service to run under.
-.NOTES
-    Version 2.1
-    Last modified on 26-06-2019
-    Designed by Don Jones and Jeffrey Hicks
-    Lab executed by Marco Janse
-
-    Version History:
-    2.1 - Splatting and Return Value translation in output
-        - paragraph 12.6.2
-    2.0 - Changed to PS Module
-        - Changed Set-TMServicePassowrd to and advanced function
-        - paragraph 11.2.2
-        - + additional elseif statement for systemaccounts
-    1.1 - added credits to the notes
-    1.0 - Lab from paragraph 10.5 (your turn)
-.LINK
-    https://github.com/MarcoJanse/PowerShellTraining/tree/master/PowerShellScripting/Labs
-#>
-
-function Set-TMServicePassword {
+function Set-TMServiceLogon {
     <#
     .SYNOPSIS
-        Set-TMServicePassword can change a the user and password
+        Set-TMServiceLogon can change a the user and password
         for a service to run under
     .DESCRIPTION
         Set-TMServiceLogon is an advanced function to change the
@@ -45,7 +15,8 @@ function Set-TMServicePassword {
         Set-TMServiceLogon -ServiceName OurService -NewPassword
         'P@ssword' -ComputerName SERVER1,SERVER2
 
-        Set-TMServiceLogon 
+        Set-TMServiceLogon -ServiceName BITS -SystemAccount 'NT Authority\LocalSystem'
+        -ComputerName SERVER3
     .PARAMETER ComputerName
         Enter one or more computernames, seperated by commas
     .PARAMETER ServiceName
@@ -60,14 +31,17 @@ function Set-TMServicePassword {
         exist, such as LocalSystem, NT AUTHORITY\NetworkService 
         and NT AUTHORITY\LocalService
     .NOTES
-        Version 1.0
-        Last modified on 16-06-2019
+        Version 1.1
+        Last modified on 07-07-2019
         Designed by Don Jones and Jeffrey Hicks
         Lab executed by Marco Janse
 
         Version History:
+        1.1 - Added verbose output
         1.0 - First advanced function version in MOLTools module
             - paragraph 11.2.2
+    .LINK
+    https://github.com/MarcoJanse/PowerShellTraining/tree/master/PowerShellScripting/Labs
 
     #>
     [CmdletBinding()]
@@ -99,18 +73,22 @@ function Set-TMServicePassword {
     PROCESS {
 
         foreach ($Computer in $ComputerName) {
-
+            
+            Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Creating CIM session for $Computer using WS-MAN"
             $Option = New-CimSessionOption -Protocol Wsman
             $Session = New-CimSession -SessionOption $option -ComputerName $Computer
 
             If ( $PSBoundParameters.ContainsKey('NewUser') ) {
                 $args = @{'StartName' = $NewUser; 'StartPassword' = $NewPassword }
+                Write-Warning "Setting a new user name "
             }
             elseif ($PSBoundParameters.ContainsKey('$SystemAccount') ) {
                 $args = @{'StartName' = $Systemaccount}
+                Write-Warning "Setting System Account"
             }
             Else {
                 $args = @{'StartPassword' = $NewPassword }
+                Write-Warning "Not setting a new user name"
             }
 
             $Params = @{
@@ -119,6 +97,7 @@ function Set-TMServicePassword {
                             MethodName = 'Change';
                             Arguments = $args
                           }
+            Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Invoking CimMethod" 
             $ret = Invoke-CimMethod @Params 
 
             switch ($ret.ReturnValue) {
@@ -134,6 +113,7 @@ function Set-TMServicePassword {
             $obj = New-Object -TypeName PSObject -Property $props
             Write-Output $obj
             
+            Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] -Cleaning up CIM session for $Computer"
             $session | Remove-CimSession
 
         } # for each $Computer
@@ -142,6 +122,6 @@ function Set-TMServicePassword {
 
     END {}
 
-} # Set-TMServicePassword
+} # Set-TMServiceLogon
 
 # END OF MODULE
