@@ -9,6 +9,7 @@
     By Marco Janse
 
     Version History:
+    1.0 Finished version with 3 examples
     0.1 started writing intial script --UNFINISHED--
 #>
 
@@ -53,22 +54,33 @@ Function Example3 {
 
     if ($PSBoundParameters.ContainsKey("InformationVariable")) {
         $Info = $true
-        $InfVar = $PSBoundParameters{"InformationVariable"}
+        $InfVar = $PSBoundParameters["InformationVariable"]
     }
 
     if ($Info) {
         Write-Host "Starting $($MyInvocation.MyCommand)" -ForegroundColor Green
-        (Get-Variable $InfVar).Value[-1].tags.Add("Process")
+        (Get-Variable $InfVar).Value[-1].Tags.Add("Process")
 
         Write-Host "PSVersion = $($PSVersionTable.PSVersion)" -ForegroundColor Green
         (Get-Variable $InfVar).Value[-1].tags.Add("Meta")
         
-        Write-Host "OS = $((Get-CimInstance Win32_OperationSystem).Caption)" -ForegroundColor Green
+        Write-Host "OS = $((Get-CimInstance Win32_OperatingSystem).Caption)" -ForegroundColor Green
         (Get-Variable $InfVar).Value[-1].tags.Add("Meta")
 
         Write-Verbose "Getting top 5 processes by WorkingSet"
-        Get-Process | Sort-Object WS -Descending | Select-Object -First 5 -OutVariable script
+        Get-Process | Sort-Object WS -Descending | Select-Object -First 5 -OutVariable s
+
+        if ($info) {
+            Write-Host ( $s[0] | Out-String ) -ForegroundColor Green
+            (Get-Variable $InfVar).Value[-1].Tags.Add("Data")
+
+            Write-Host " Ending $($MyInvocation.MyCommand) " -ForegroundColor Green
+            ( Get-Variable $InfVar ).Value[-1].Tags.Add("Process")
+        } # if ($info)
+
     } # if
 
     
-}
+} # Function Example3
+
+Example3 -InformationVariable inf3
