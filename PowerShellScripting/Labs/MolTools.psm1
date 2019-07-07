@@ -1,47 +1,77 @@
 function Set-TMServiceLogon {
     <#
     .SYNOPSIS
-        Set-TMServiceLogon can change a the user and password
-        for a service to run under
+        Sets service login name and password
+
     .DESCRIPTION
-        Set-TMServiceLogon is an advanced function to change the
-        user and (optionally) the password for a Windows service 
-        to run under.
+        This function uses either CIM (default) or WMI to set
+        the service password, and optionally the logon user
+        name, for a service, which can be running on one or
+        more remote machines. You must run this command as a
+        user who has permissions to perform this task remotely
+        on the computers involved.
+
+    .PARAMETER ServiceName
+        The name of the service. Query the Win32_Service class
+        to verify that you know the correct name.
+
+    .PARAMETER ComputerName
+        Enter one or more computernames, seperated by commas.
+        Using IP addresses will fail with CIM; they will work
+        with WMI. CIM is always attempted first.
+
+    .PARAMETER NewPassword
+        A plain-text string of the new password (That's BAD!!)
+
+    .PARAMETER NewUser
+        Optional: The new logon user name, in DOMAIN\USER format.
+
+    .PARAMETER SystemAccount
+        Can be used for setting the built-in system accounts that 
+        exist, such as LocalSystem, NT AUTHORITY\NetworkService 
+        and NT AUTHORITY\LocalService
+    .PARAMETER ErrorLogFilePath
+        If provided, this is a path and filename of a text file
+        where failed computer names will be logged.
+
     .EXAMPLE
         Set-TMServiceLogon -ServiceName OurService -NewPassword `
         'P@ssw0rd' -NewUser "COMPANY\User" -ComputerName SERVER1,
         SERVER2
 
+        This will set the service OurService on SERVER1 and SERVER2
+        to run under COMPANY\USER with a password of "P@ssword"
+
+    .EXAMPLE
         Set-TMServiceLogon -ServiceName OurService -NewPassword
         'P@ssword' -ComputerName SERVER1,SERVER2
 
+        This will only change the password service OurService on 
+        SERVER1 and SERVER2 to run under "P@ssword"
+
+    .EXAMPLE
         Set-TMServiceLogon -ServiceName BITS -SystemAccount 'NT Authority\LocalSystem'
         -ComputerName SERVER3
-    .PARAMETER ComputerName
-        Enter one or more computernames, seperated by commas
-    .PARAMETER ServiceName
-        Can be used to specify the Windows Service Name. This
-        parameter is required
-    .PARAMETER NewPassword
-        The new password for the account the service runs under
-    .PARAMETER NewUser
-        The user account the service should run under.
-    .PARAMETER SystemAccount
-        Can be used for setting the built-in system accounts that 
-        exist, such as LocalSystem, NT AUTHORITY\NetworkService 
-        and NT AUTHORITY\LocalService
+
+        This will set the BITS service on SERVER3 to run under the default LocalSystem
+        account, for which a password doesn't need to be set, as Windows takes care 
+        of this.
+
     .NOTES
-        Version 1.1
+        Version 1.2
         Last modified on 07-07-2019
         Designed by Don Jones and Jeffrey Hicks
         Lab executed by Marco Janse
 
         Version History:
+        1.2 - Updated/added comment based help
+            - chapter 14.6
         1.1 - Added verbose output
         1.0 - First advanced function version in MOLTools module
             - paragraph 11.2.2
+            
     .LINK
-    https://github.com/MarcoJanse/PowerShellTraining/tree/master/PowerShellScripting/Labs
+    https://github.com/MarcoJanse/PowerShellTraining/blob/master/PowerShellScripting/Labs/MolTools.psm1
 
     #>
     [CmdletBinding()]
