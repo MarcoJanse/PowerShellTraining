@@ -30,13 +30,16 @@
     Get-ADUser -Filter * | Select -Expand Name | Get-MachineInfo
     This example will try to query all machines in AD
 .NOTES
-    Version 1.2
-    Last modified on 07-07-2019
+    Version 1.3
+    Last modified on 09-07-2019
     By Marco Janse
 .LINK
     https://github.com/MarcoJanse/PowerShellTraining/blob/master/PowerShellScripting/Examples/Get-MachineInfo.ps1
 
     Version History:
+    1.3 - added error handling
+        - removed semicolon in parameter splatting tables
+        - paragraph 15.4
     1.2 - added new command based help
         - listing 14.1
     1.1 - adding verbose output
@@ -59,7 +62,7 @@ function Get-MachineInfo {
         [Alias('CN','MachineName','Name')]
         [string[]]$ComputerName,
 
-        [string]$LogFailurersToPath,
+        [string]$LogFailuresToPath,
 
         [ValidateSet('Wsman','Dcom')]
         [string]$Protocol = "Wsman",
@@ -84,32 +87,33 @@ function Get-MachineInfo {
             try {
                 Write-Verbose -Message "Connecting to $computer over $protocol"
                 $params = @{
-                            'ComputerName'=$Computer;
-                            'SessionOption'=$option;
-                            'ErrorAction'='Stop'
+                            'ComputerName' = $Computer
+                            'SessionOption' = $option
+                            'ErrorAction' = 'Stop'
+                            'ErrorVariable' = 'CimError'
                 }
                 $Session = New-CimSession @params
 
                 Write-Verbose -Message "Querying from $computer"
                 $os_params = @{
-                                'ClassName'='Win32_OperatingSystem';
-                                'CimSession'=$Session}
+                                'ClassName' = 'Win32_OperatingSystem'
+                                'CimSession' = $Session}
                 $os = Get-CimInstance @os_params
 
                 $cs_params = @{
-                                'ClassName'='Win32_ComputerSystem';
-                                'CimSession'=$session}
+                                'ClassName' = 'Win32_ComputerSystem'
+                                'CimSession' = $session}
                 $cs = Get-CimInstance @cs_params
                 
                 $sysdrive = $os.SystemDrive
                 $drive_params = @{
-                                    'ClassName'='Win32_LogicalDisk';
-                                    'Filter'="DeviceId='$sysdrive'";
-                                    'CimSession'=$Session}
+                                    'ClassName' = 'Win32_LogicalDisk'
+                                    'Filter' = "DeviceId='$sysdrive'"
+                                    'CimSession' = $Session}
                 $drive = Get-CimInstance @drive_params
 
                 $proc_params = @{
-                                    'ClassName'='Win32_Processor';
+                                    'ClassName'='Win32_Processor'
                                     'CimSession'=$Session}
                 $proc = Get-CimInstance @proc_params | Select-Object -First 1
 
@@ -118,22 +122,55 @@ function Get-MachineInfo {
 
                 Write-Verbose -Message "Outputting for $computer"
                 $obj = [PSCustomObject]@{
-                            ComputerName = $Computer;
-                            OSVersion = $os.Version;
-                            SPVersion = $os.ServicePackMajorVersion;
-                            OSBuild = $os.Buildnumber;
-                            Manufacturer = $cs.Manufacturer;
-                            Procs = $cs.NumberOfProcessors;
-                            Cores = $cs.NumberOfLogicalProcessors;
-                            RAM = ($cs.TotalPhysicalMemory / 1GB);
-                            Arch = $proc.AddressWidth;
-                            SysDriveFreeSpace = $drive.FreeSpace} # obj
+                            ComputerName = $Computer
+                            OSVersion = $os.Version
+                            SPVersion = $os.ServicePackMajorVersion
+                            OSBuild = $os.Buildnumber
+                            Manufacturer = $cs.Manufacturer
+                            Procs = $cs.NumberOfProcessors
+                            Cores = $cs.NumberOfLogicalProcessors
+                            RAM = ($cs.TotalPhysicalMemory / 1GB)
+                            Arch = $proc.AddressWidth
+                            SysDriveFreeSpace = $drive.FreeSpace} # $obj
                 
                 Write-Output $obj
-            } # try
+            } # try New-CimSession
             catch {
                 Write-Warning -Message "FAILED $computer on $protocol"
-            }
+                # Did we specify protocol failback?
+                # If so, try again. If we specified logging, we won't
+                #  log a problem here - we'll let the logging occur
+                #  if this fallback also fails
+                if ($ProtocolFallBack) {
+                    If ($Protocol -eq 'Dcom') {
+                        $NewProtocol = 'Wsman'
+                    }
+                    else {
+                        $NewProtocol = 'Dcom'
+                    } # if protocol
+                    Write-Verbose -Message "Trying again with $NewProtocol"
+                    $params = @{'ComputerName'=$Computer
+                                'Protocol'=$NewProtocol
+                                'ProtocolFallBack'=$false}
+                
+                    if ($PSBoundParameters.ContainsKey('LogFailuresToPath')) {
+                        $params += @{'LogFailuresToPath'=$LogFailuresToPath}
+                    } # if LogFailuresToPath
+                
+                    Get-MachineInfo @params
+
+                } # if ($ProtocolFallBack)
+
+                # If we didn't specify fallback, but we did specify
+                #  logging, then log the error, because we won't
+                #  be trying again
+                if (-not $ProtocolFallBack -and $PSBoundParameters.ContainsKey('LogFailuresToPath')) {
+                    Write-Verbose -Message "Logging to $LogFailuresToPath"
+                    $computer | Out-File $LogFailuresToPath -Append
+                    $CimError | Out-File $LogFailuresToPath -Append
+                }  # if LogFailureToPath
+
+            } # try/catch New-CimSession
 
         } # for each Computer
 
