@@ -81,54 +81,59 @@ function Get-MachineInfo {
                 $option = New-CimSessionOption -Protocol Wsman
             }
 
-            Write-Verbose -Message "Connecting to $computer over $protocol"
-            $Session = New-CimSession -ComputerName $Computer -SessionOption $option
+            try {
+                Write-Verbose -Message "Connecting to $computer over $protocol"
+                $params = @{
+                            'ComputerName'=$Computer;
+                            'SessionOption'=$option;
+                            'ErrorAction'='Stop'
+                }
+                $Session = New-CimSession @params
 
-            Write-Verbose -Message "Querying from $computer"
-            $os_params = @{
-                            'ClassName'='Win32_OperatingSystem';
-                            'CimSession'=$Session
-                          }
-            $os = Get-CimInstance @os_params
+                Write-Verbose -Message "Querying from $computer"
+                $os_params = @{
+                                'ClassName'='Win32_OperatingSystem';
+                                'CimSession'=$Session}
+                $os = Get-CimInstance @os_params
 
-            $cs_params = @{
-                            'ClassName'='Win32_ComputerSystem';
-                            'CimSession'=$session
-                          }
-            $cs = Get-CimInstance @cs_params
-            
-            $sysdrive = $os.SystemDrive
-            $drive_params = @{
-                                'ClassName'='Win32_LogicalDisk';
-                                'Filter'="DeviceId='$sysdrive'";
-                                'CimSession'=$Session
-                             }
-            $drive = Get-CimInstance @drive_params
+                $cs_params = @{
+                                'ClassName'='Win32_ComputerSystem';
+                                'CimSession'=$session}
+                $cs = Get-CimInstance @cs_params
+                
+                $sysdrive = $os.SystemDrive
+                $drive_params = @{
+                                    'ClassName'='Win32_LogicalDisk';
+                                    'Filter'="DeviceId='$sysdrive'";
+                                    'CimSession'=$Session}
+                $drive = Get-CimInstance @drive_params
 
-            $proc_params = @{
-                                'ClassName'='Win32_Processor';
-                                'CimSession'=$Session
-                            }
-            $proc = Get-CimInstance @proc_params | Select-Object -First 1
+                $proc_params = @{
+                                    'ClassName'='Win32_Processor';
+                                    'CimSession'=$Session}
+                $proc = Get-CimInstance @proc_params | Select-Object -First 1
 
-            Write-Verbose -Message "Closing session to $computer"
-            $Session | Remove-CimSession
+                Write-Verbose -Message "Closing session to $computer"
+                $Session | Remove-CimSession
 
-            Write-Verbose -Message "Outputting for $computer"
-            $obj = [PSCustomObject]@{
-                        ComputerName = $Computer;
-                        OSVersion = $os.Version;
-                        SPVersion = $os.ServicePackMajorVersion;
-                        OSBuild = $os.Buildnumber;
-                        Manufacturer = $cs.Manufacturer;
-                        Procs = $cs.NumberOfProcessors;
-                        Cores = $cs.NumberOfLogicalProcessors;
-                        RAM = ($cs.TotalPhysicalMemory / 1GB);
-                        Arch = $proc.AddressWidth;
-                        SysDriveFreeSpace = $drive.FreeSpace
-            } # obj
-            
-            Write-Output $obj
+                Write-Verbose -Message "Outputting for $computer"
+                $obj = [PSCustomObject]@{
+                            ComputerName = $Computer;
+                            OSVersion = $os.Version;
+                            SPVersion = $os.ServicePackMajorVersion;
+                            OSBuild = $os.Buildnumber;
+                            Manufacturer = $cs.Manufacturer;
+                            Procs = $cs.NumberOfProcessors;
+                            Cores = $cs.NumberOfLogicalProcessors;
+                            RAM = ($cs.TotalPhysicalMemory / 1GB);
+                            Arch = $proc.AddressWidth;
+                            SysDriveFreeSpace = $drive.FreeSpace} # obj
+                
+                Write-Output $obj
+            } # try
+            catch {
+                Write-Warning -Message "FAILED $computer on $protocol"
+            }
 
         } # for each Computer
 
