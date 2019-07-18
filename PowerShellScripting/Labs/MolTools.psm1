@@ -58,14 +58,16 @@ function Set-TMServiceLogon {
         of this.
 
     .NOTES
-        Version 1.2
-        Last modified on 07-07-2019
+        Version 1.2.5
+        Last modified on 18-07-2019
         Designed by Don Jones and Jeffrey Hicks
         Lab executed by Marco Janse
 
         Version History:
+        1.2.5 - Added Error Handling  -- In PROGRESS --
+              - paragraph 15.8.2 
         1.2 - Updated/added comment based help
-            - chapter 14.6
+            - paragraph 14.6
         1.1 - Added verbose output
         1.0 - First advanced function version in MOLTools module
             - paragraph 11.2.2
@@ -104,9 +106,22 @@ function Set-TMServiceLogon {
 
         foreach ($Computer in $ComputerName) {
             
-            Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Creating CIM session for $Computer using WS-MAN"
-            $Option = New-CimSessionOption -Protocol Wsman
-            $Session = New-CimSession -SessionOption $option -ComputerName $Computer
+            try {
+                $EverythingOk = $true
+                Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Creating CIM session for $Computer using WS-MAN"
+                $Option = New-CimSessionOption -Protocol Wsman
+                $Session = New-CimSession -SessionOption $option -ComputerName $Computer -ErrorAction Stop
+            }
+            catch {
+                $EverythingOk = $true
+                Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Creating CIM session for $Computer using WS-MAN"
+                $Option = New-CimSessionOption -Protocol Dcom
+                $Session = New-CimSession -SessionOption $option -ComputerName $Computer -ErrorAction Stop
+            }
+            catch {
+                $EverythingOK = $false
+
+            }
 
             If ( $PSBoundParameters.ContainsKey('NewUser') ) {
                 $args = @{'StartName' = $NewUser; 'StartPassword' = $NewPassword }
