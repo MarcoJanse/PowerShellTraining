@@ -30,6 +30,7 @@ function Set-TMServiceLogon {
         Can be used for setting the built-in system accounts that 
         exist, such as LocalSystem, NT AUTHORITY\NetworkService 
         and NT AUTHORITY\LocalService
+        
     .PARAMETER ErrorLogFilePath
         If provided, this is a path and filename of a text file
         where failed computer names will be logged.
@@ -58,12 +59,16 @@ function Set-TMServiceLogon {
         of this.
 
     .NOTES
-        Version 1.2.5
-        Last modified on 18-07-2019
+        Version 1.3
+        Last modified on 28-07-2019
         Designed by Don Jones and Jeffrey Hicks
         Lab executed by Marco Janse
 
         Version History:
+        1.3   - Error Handling -- LOOP ISSUE --
+              - listing 15.2
+        1.2.6 - Error Handling -- IN PROGRESS --
+              - My own attempt
         1.2.5 - Added Error Handling  -- In PROGRESS --
               - paragraph 15.8.2 
         1.2 - Updated/added comment based help
@@ -105,62 +110,80 @@ function Set-TMServiceLogon {
     PROCESS {
 
         foreach ($Computer in $ComputerName) {
-            
-            try {
-                $EverythingOk = $true
-                Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Creating CIM session for $Computer using WS-MAN"
-                $Option = New-CimSessionOption -Protocol Wsman
-                $Session = New-CimSession -SessionOption $option -ComputerName $Computer -ErrorAction Stop
-            }
-            catch {
-                $EverythingOk = $true
-                Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Creating CIM session for $Computer using WS-MAN"
-                $Option = New-CimSessionOption -Protocol Dcom
-                $Session = New-CimSession -SessionOption $option -ComputerName $Computer -ErrorAction Stop
-            }
-            catch {
-                $EverythingOK = $false
 
-            }
+            Do {
+                Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Connect to $Computer on WS-MAN"
+                $Protocol = "Wsman"
 
-            If ( $PSBoundParameters.ContainsKey('NewUser') ) {
-                $args = @{'StartName' = $NewUser; 'StartPassword' = $NewPassword }
-                Write-Warning "Setting a new user name "
-            }
-            elseif ($PSBoundParameters.ContainsKey('$SystemAccount') ) {
-                $args = @{'StartName' = $Systemaccount}
-                Write-Warning "Setting System Account"
-            }
-            Else {
-                $args = @{'StartPassword' = $NewPassword }
-                Write-Warning "Not setting a new user name"
-            }
+                try {                
+                    $Option = New-CimSessionOption -Protocol $Protocol
+                    $Session = New-CimSession -SessionOption $option -ComputerName $Computer -ErrorAction Stop
+                                        
+                    If ( $PSBoundParameters.ContainsKey('NewUser') ) {
+                        $args = @{'StartName' = $NewUser; 'StartPassword' = $NewPassword }
+                        Write-Warning "Setting a new user name "
+                    }
+                    elseif ($PSBoundParameters.ContainsKey('$SystemAccount') ) {
+                        $args = @{'StartName' = $Systemaccount}
+                        Write-Warning "Setting System Account"
+                    }
+                    Else {
+                        $args = @{'StartPassword' = $NewPassword }
+                        Write-Warning "Not setting a new user name"
+                    }
 
-            $Params = @{
-                            CimSession = $Session;
-                            Query = "Select * FROM Win32_Service WHERE Name='$ServiceName'";
-                            MethodName = 'Change';
-                            Arguments = $args
-                          }
-            Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Invoking CimMethod" 
-            $ret = Invoke-CimMethod @Params 
+                    Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Setting $ServiceName on $Computer"
 
-            switch ($ret.ReturnValue) {
-                0 { $status = "Success" }
-                22 { $status = "Invalid Account" }
-                Default { $status = "Failed:$($ret.ReturnValue)"}
-            } # switch
-            
-            $props = @{
-                        ComputerName = $computer;
-                        Status = $status;
-                      }
-            $obj = New-Object -TypeName PSObject -Property $props
-            Write-Output $obj
-            
-            Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] -Cleaning up CIM session for $Computer"
-            $session | Remove-CimSession
+                    $Params = @{
+                                    CimSession = $Session;
+                                    Query = "Select * FROM Win32_Service WHERE Name='$ServiceName'";
+                                    MethodName = 'Change';
+                                    Arguments = $args
+                                }
+                    Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Invoking CimMethod" 
+                    $ret = Invoke-CimMethod @Params 
 
+                    switch ($ret.ReturnValue) {
+                        0 { $status = "Success" }
+                        22 { $status = "Invalid Account" }
+                        Default { $status = "Failed:$($ret.ReturnValue)"}
+                    } # switch
+                    
+                    $props = @{
+                                ComputerName = $computer;
+                                Status = $status;
+                            }
+                    $obj = New-Object -TypeName PSObject -Property $props
+                    Write-Output $obj
+                    
+                    Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Closing CIM session for $Computer"
+                    $session | Remove-CimSession
+                } # try
+
+                catch {
+                    # change protocol - if we've tried both and logging
+                    #  was specified, log the computer name
+                    Switch ($Protocol) {
+                        'Wsman' { $Protocol = 'Dcom'
+                            Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Switching to Dcom for $Computer" 
+                        } 
+                        'Dcom' { 
+                            $Protocol = 'Stop'
+                            Write-Warning -Message "Unable to connect to $Computer using any protocol"
+                            Write-Verbose -Message "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Switching to Stop for $Computer"
+                            
+                            if ($PSBoundParameters.ContainsKey('ErrorLogFilePath')) {
+                                Write-Warning "$Computer failed; logged to $ErrorLogFilePath"
+                                Add-Content $ErrorLogFilePath -Value "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - Processing $Computer Failed; Error Message:"
+                                Add-Content $ErrorLogFilePath -Value "[PROCESS] - [$((Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))] - $($_.Exception.Message)"
+                            } # if logging
+                        } 
+                    } # switch 
+
+                } # try/catch
+
+            } Until ($Protocol -eq 'Stop')
+         
         } # for each $Computer
 
     } #PROCESS
