@@ -98,7 +98,7 @@ Function Add-ExpiryDataToUser {
 function Send-PasswordExpiryMessageToUser {
     [CmdletBinding()]
     Param(
-        [Paramter(ValueFromPipeline=$True)]
+        [Parameter(ValueFromPipeline=$True)]
         [object[]]$InputObject,
 
         [Parameter(Mandatory=$True)]
