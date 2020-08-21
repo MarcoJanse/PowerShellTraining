@@ -4,7 +4,7 @@
 .DESCRIPTION
     PowerShell Practice Primer - Part 1 Exercises
 .NOTES
-    Last modified on 15-8-20920
+    Last modified on 21-8-20920
     Designed by Jeffrey Hicks
     Exercises executed by Marco Janse
 
@@ -12,6 +12,7 @@
 
     Version History:
     
+    0.2 - exercise 21 added
     0.1 - what I did during my holiday in August
 #>
 
@@ -78,3 +79,8 @@ Get-Process -IncludeUserName | Where-Object { $_.UserName -eq 'SMURFACE\marco' }
 Import-Clixml -Path C:\Scripts\Output\UserProcesses.xml | Group-Object -Property Company
 
 # Exercise 21
+$x = 1
+
+while($x -le 10){ $x++ ; Get-Random -Minimum 1 -Maximum 50 | ForEach-Object { $_ * $_ } }
+
+# Exercise 22
