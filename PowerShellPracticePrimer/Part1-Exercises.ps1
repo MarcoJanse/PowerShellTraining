@@ -4,14 +4,15 @@
 .DESCRIPTION
     PowerShell Practice Primer - Part 1 Exercises
 .NOTES
-    Last modified on 21-8-20920
+    Last modified on 23-8-20920
     Designed by Jeffrey Hicks
     Exercises executed by Marco Janse
 
-    Version 0.1
+    Version 0.3
 
     Version History:
     
+    0.3 - exercise 22 and 23 added
     0.2 - exercise 21 added
     0.1 - what I did during my holiday in August
 #>
@@ -84,3 +85,10 @@ $x = 1
 while($x -le 10){ $x++ ; Get-Random -Minimum 1 -Maximum 50 | ForEach-Object { $_ * $_ } }
 
 # Exercise 22
+# ..NOT SURE IF I GOT THIS RIGHT..
+Get-WinEvent -ComputerName localhost -ListLog * | Select-Object @{Name='ComputerName';Expression={$Env:COMPUTERNAME}},LogName,RecordCount | ConvertTo-Html -Title 'Exercise 22' | Out-File C:\Scripts\Output\PSPrimer_Exercise22.html
+
+# Exercise 23
+Find-Module -Filter 'teaching'
+
+# Exercise 24
