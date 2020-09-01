@@ -12,6 +12,7 @@
 
     Version History:
     
+    0.4 - added final exercises 24 and 25
     0.3 - exercise 22 and 23 added
     0.2 - exercise 21 added
     0.1 - what I did during my holiday in August
@@ -92,3 +93,8 @@ Get-WinEvent -ComputerName localhost -ListLog * | Select-Object @{Name='Computer
 Find-Module -Filter 'teaching'
 
 # Exercise 24
+Get-Service | Select-Object -ExcludeProperty RequiredServices, DependentServices,ServicesDependedOn | ConvertTo-Json | Out-File C:\Scripts\Output\PSPrimer_Exercise24.json
+Get-Content C:\Scripts\Output\PSPrimer_Exercise24.json | ConvertFrom-Json
+
+# Exercise 25
+Test-NetConnection -ComputerName localhost -CommonTCPPort HTTP
