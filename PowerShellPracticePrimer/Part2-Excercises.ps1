@@ -52,3 +52,9 @@ Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' |
 Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' -Name 'RegisteredOrganization' -Value $var
 
 
+# Exercise 7
+
+### I have no clue how to find out which PSProvider supports transactions :(
+
+# Exercise 8
+
