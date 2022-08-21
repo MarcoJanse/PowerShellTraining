@@ -1,6 +1,9 @@
-# Part 1 - Excersises
+# Part 1 - Exersises
 
-- [Part 1 - Excersises](#part-1---excersises)
+## Table of Contents
+
+- [Part 1 - Exersises](#part-1---exersises)
+  - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Notes](#notes)
   - [Version History](#version-history)
