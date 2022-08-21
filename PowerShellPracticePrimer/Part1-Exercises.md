@@ -7,7 +7,8 @@
   - [Introduction](#introduction)
   - [Notes](#notes)
   - [Version History](#version-history)
-    - [Version details](#version-details)
+    - [Version Details](#version-details)
+    - [Revisions](#revisions)
   - [Excercises](#excercises)
     - [Exercise 1](#exercise-1)
     - [Exercise 2](#exercise-2)
@@ -62,16 +63,19 @@ This document contains the first part of exercises from [The PowerShell Practce 
 
 ## Version History
 
-### Version details
+### Version Details
 
-- Version 2.0
+- Version 2.1
 - Sunday, 21 August 2022
 
+### Revisions
+
+- 2.1 - Index and Formatting fixes
 - 2.0 - Converted from PowerShell file (.ps1) to Markdown (.md)
 - 1.0 - Reviewed with the solutions from the book and corrected/adjusted where necessary
-- 0.4 - added final exercises 24 and 25
-- 0.3 - exercise 22 and 23 added
-- 0.2 - exercise 21 added
+- 0.4 - Added final exercises 24 and 25
+- 0.3 - Exercise 22 and 23 added
+- 0.2 - Exercise 21 added
 - 0.1 - what I did during my holiday in August
 
 ## Excercises
