@@ -54,7 +54,13 @@ Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' -Na
 
 # Exercise 7
 
-### I have no clue how to find out which PSProvider supports transactions :(
+## My solution
+
+$HelpFiles = help about_*provider* | Select-Object -ExpandProperty Name
+
+foreach ($HelpFile in $HelpFiles) {
+    Get-Help $helpfile | Select-String -Pattern 'transaction'
+}
 
 # Exercise 8
 
