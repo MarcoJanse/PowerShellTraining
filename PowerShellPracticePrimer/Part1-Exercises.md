@@ -1,8 +1,8 @@
-# Part 1 - Exersises
+# Part 1 - Exercises
 
 ## Table of Contents
 
-- [Part 1 - Exersises](#part-1---exersises)
+- [Part 1 - Exercises](#part-1---exercises)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Notes](#notes)
@@ -39,15 +39,15 @@
     - [Exercise 21](#exercise-21)
       - [21 - My solution](#21---my-solution)
       - [21 - Jeff's solution 1](#21---jeffs-solution-1)
-      - [Jeff's solution 2](#jeffs-solution-2)
+      - [21 - Jeff's solution 2](#21---jeffs-solution-2)
     - [Exercise 22](#exercise-22)
       - [22 - My Solution ===NOT QUITE RIGHT===](#22---my-solution-not-quite-right)
-      - [21- Jeff's solution](#21--jeffs-solution)
+      - [21 - Jeff's solution](#21---jeffs-solution)
     - [Exercise 23](#exercise-23)
-      - [23- My solution](#23--my-solution)
+      - [23 - My solution](#23---my-solution)
       - [23 - Jeff's solution](#23---jeffs-solution)
     - [Exercise 24](#exercise-24)
-      - [24 -My solution](#24--my-solution)
+      - [24 - My solution](#24---my-solution)
       - [24 - Jeff's solution](#24---jeffs-solution)
     - [Exercise 25](#exercise-25)
 
@@ -268,7 +268,7 @@ for ($i=1;$i -le 10;$i++) {
 }
 ```
 
-#### Jeff's solution 2
+#### 21 - Jeff's solution 2
 
 ```powershell
 1..10 | foreach {
@@ -288,7 +288,7 @@ Get-WinEvent -ComputerName localhost -ListLog * |
     Out-File C:\Scripts\Output\PSPrimer_Exercise22.html
 ```
 
-#### 21- Jeff's solution
+#### 21 - Jeff's solution
 
 ```powershell
 Get-EventLog -List |
@@ -301,7 +301,7 @@ Get-EventLog -List |
 
 ### Exercise 23
 
-#### 23- My solution
+#### 23 - My solution
 
 ```powershell
 Find-Module -Filter 'teaching'
@@ -315,7 +315,7 @@ Find-Module -Tag teaching -Repository PSGallery
 
 ### Exercise 24
 
-#### 24 -My solution
+#### 24 - My solution
 
 ```powershell
 Get-Service |
