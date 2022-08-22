@@ -19,6 +19,7 @@
     - [Exercise 7](#exercise-7)
       - [07 - My solution](#07---my-solution)
     - [Exercise 8](#exercise-8)
+    - [Exercise 9](#exercise-9)
 
 ## Introduction
 
@@ -125,4 +126,10 @@ help about_certificate_provider -ShowWindow
 # Answer in helpfile
 
 Get-ChildItem -Path cert: -CodeSigningCert -Recurse
+```
+
+### Exercise 9
+
+```powershell
+($env:Path).Split(";")
 ```
