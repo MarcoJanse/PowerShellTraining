@@ -19,6 +19,7 @@
     - [Exercise 7](#exercise-7)
       - [07 - My solution](#07---my-solution)
     - [Exercise 8](#exercise-8)
+      - [Answer in helpfile](#answer-in-helpfile)
     - [Exercise 9](#exercise-9)
 
 ## Introduction
@@ -122,9 +123,11 @@ foreach ($HelpFile in $HelpFiles) {
 help *certificate* | Select-String 'codesigning'
 
 help about_certificate_provider -ShowWindow
+```
 
-# Answer in helpfile
+#### Answer in helpfile
 
+```powershell
 Get-ChildItem -Path cert: -CodeSigningCert -Recurse
 ```
 
