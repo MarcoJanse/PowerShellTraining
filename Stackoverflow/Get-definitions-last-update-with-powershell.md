@@ -42,3 +42,7 @@ To update signatures when they're older than a day:
 ```powershell
 if ((Get-MpComputerStatus).AntispywareSignatureAge -gt 0) { Update-MpSignature -Verbose }
 ```
+
+## Reference
+
+[Get definitions last update with powershell | Stackoverflow](https://stackoverflow.com/questions/74472571/get-definitions-last-update-with-powershell/74473508#74473508)
