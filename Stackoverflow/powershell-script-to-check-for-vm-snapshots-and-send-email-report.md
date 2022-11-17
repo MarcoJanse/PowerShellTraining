@@ -74,4 +74,4 @@ The script listed in this blog should give you a good start: [https://p0wershell
 
 ## Reference
 
-[PowerShell script to check for VM snapshots and send Email report](https://stackoverflow.com/questions/73548103/powershell-script-to-check-for-vm-snapshots-and-send-email-report/73548417#73548417)
+[PowerShell script to check for VM snapshots and send Email report | Stackoverflow](https://stackoverflow.com/questions/73548103/powershell-script-to-check-for-vm-snapshots-and-send-email-report/73548417#73548417)

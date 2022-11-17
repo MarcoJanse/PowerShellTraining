@@ -36,4 +36,4 @@ You might want to check this article to see how you can register an app and auth
 
 ## Reference
 
-[Task Scheduler - Powershell script not firing?](https://stackoverflow.com/questions/73635293/task-scheduler-powershell-script-not-firing/73636251#73636251)
+[Task Scheduler - Powershell script not firing? | Stackoverflow](https://stackoverflow.com/questions/73635293/task-scheduler-powershell-script-not-firing/73636251#73636251)

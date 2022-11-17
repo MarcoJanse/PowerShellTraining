@@ -37,4 +37,4 @@ I get the same categories in PowerShell v7.2
 
 ## Reference
 
-[How to view categories in Powershell v5?](https://stackoverflow.com/questions/73963720/how-to-view-categories-in-powershell-v5/73965282#73965282)
+[How to view categories in Powershell v5? | Stackoverflow](https://stackoverflow.com/questions/73963720/how-to-view-categories-in-powershell-v5/73965282#73965282)
