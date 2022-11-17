@@ -1,6 +1,6 @@
 # How to upload a csv to box folder using powershell
 
-## Orginal question
+## Original question
 
 >i'm new to powershell i have a script running on multiple devices to fetch details and i want a single csv to be generated with those details in a box folder . i wanted to know how to upload a csv to box folder using powershell without hard coding any credentials in script.
 
