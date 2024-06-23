@@ -9,7 +9,7 @@
   - [Version History](#version-history)
     - [Version Details](#version-details)
     - [Revisions](#revisions)
-  - [Excercises](#excercises)
+  - [Exercises](#exercises)
     - [Exercise 1](#exercise-1)
     - [Exercise 2](#exercise-2)
     - [Exercise 3](#exercise-3)
@@ -78,7 +78,7 @@ This document contains the first part of exercises from [The PowerShell Practce 
 - 0.2 - Exercise 21 added
 - 0.1 - what I did during my holiday in August
 
-## Excercises
+## Exercises
 
 ### Exercise 1
 
@@ -143,6 +143,10 @@ Get-EventLog -LogName System -EntryType Error |
 ## or better
 
 Get-EventLog -LogName System -Newest 10 -EntryType Error
+
+## Or using WinEvent in PS7
+
+Get-WinEvent -FilterHashtable @{ LogName = 'System'; Level = 2; } -MaxEvents 10
 ```
 
 ### Exercise 11
